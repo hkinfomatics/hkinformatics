@@ -1,0 +1,6 @@
+{
+  "name": "데이터 분석 탐정",
+  "description": "교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 탐정 웹 애플리케이션",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

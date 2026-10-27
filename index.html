@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>데이터 분석 탐정 - 교육용 데이터 시각화 & 분석 플랫폼</title>
+    <meta name="description" content="교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 탐정 웹 애플리케이션" />
+    <meta property="og:title" content="데이터 분석 탐정" />
+    <meta property="og:description" content="교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 탐정 웹 애플리케이션" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- CDN Libraries: Chart.js, Chart.js DataLabels, PapaParse, html2pdf.js, Firebase Compat SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  </head>
+  <body>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-container">
+        <div class="brand-badge">
+          <div class="detective-icon-box">🔍</div>
+          <div>
+            <h1 class="brand-title">데이터 분석 탐정</h1>
+            <p class="brand-sub">교육 현장(수업·평가·기록)을 위한 스마트 데이터 분석 연구소</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="firebase-status-badge" class="btn btn-sm btn-outline">
+            💾 로컬 모드
+          </button>
+          <button id="btn-open-load-modal" class="btn btn-sm btn-secondary">
+            📂 저장된 리포트 열기
+          </button>
+          <button id="btn-firebase-help" class="btn btn-sm btn-primary">
+            ⚙️ Firebase 연동 안내
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+      <!-- Detective Mission Banner -->
+      <section class="mission-banner">
+        <div class="mission-text">
+          <h2>🕵️ 오늘의 탐정 임무 (Mission)</h2>
+          <p>CSV 파일 속 숨겨진 단서를 표로 정리하고, 가장 적합한 그래프로 증거를 시각화한 후 다각도 추론 분석 리포트를 완성하세요!</p>
+        </div>
+        <div class="sample-buttons">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--pink-700); align-self: center; margin-right: 4px;">추천 사건 단서:</span>
+          <button class="btn btn-sm btn-secondary" data-sample="reading">📖 주간 독서시간</button>
+          <button class="btn btn-sm btn-secondary" data-sample="club">🎨 동아리 선호도</button>
+          <button class="btn btn-sm btn-secondary" data-sample="recycling">♻️ 쓰레기 분리배출</button>
+          <button class="btn btn-sm btn-secondary" data-sample="energy">💡 에너지 절약</button>
+        </div>
+      </section>
+
+      <!-- 4-Step Navigation Tabs -->
+      <nav class="step-nav" aria-label="분석 단계">
+        <button class="step-nav-btn active" data-step="1">
+          <span class="step-number">1</span>
+          <div>
+            <div class="step-label">데이터 입력</div>
+            <div class="step-desc">CSV 업로드 & 표 변환·정리</div>
+          </div>
+        </button>
+        <button class="step-nav-btn" data-step="2">
+          <span class="step-number">2</span>
+          <div>
+            <div class="step-label">데이터 시각화</div>
+            <div class="step-desc">그래프 선택·단위·범위 지정</div>
+          </div>
+        </button>
+        <button class="step-nav-btn" data-step="3">
+          <span class="step-number">3</span>
+          <div>
+            <div class="step-label">데이터 분석</div>
+            <div class="step-desc">기초 통계·추세·의미 해석</div>
+          </div>
+        </button>
+        <button class="step-nav-btn" data-step="4">
+          <span class="step-number">4</span>
+          <div>
+            <div class="step-label">레포트 저장·출력</div>
+            <div class="step-desc">PDF 다운로드 & 클립보드 복사</div>
+          </div>
+        </button>
+      </nav>
+
+      <!-- 사건 제목 설정 카드 -->
+      <div class="detective-card" style="padding: 16px 20px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <label for="case-title-input" style="font-weight: 700; color: var(--pink-800); font-size: 0.95rem; white-space: nowrap;">
+            🔖 현재 사건명(분석 주제):
+          </label>
+          <input type="text" id="case-title-input" class="form-input" style="flex: 1; min-width: 240px;" value="우리 반 주간 독서 시간 탐정 분석" placeholder="분석 주제 또는 사건명을 입력하세요">
+        </div>
+      </div>
+
+      <!-- ==================================================== -->
+      <!-- 기능 1: 데이터 입력 (CSV 파일 업로드, 표 변환, 데이터 삭제 및 직접 수정) -->
+      <!-- ==================================================== -->
+      <section id="step-input-card" class="detective-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📁 [기능 1] 데이터 입력: 사건 단서 파일 불러오기 & 직접 수정</h2>
+            <p class="card-subtitle">CSV 파일을 업로드하면 즉시 대화형 표로 변환됩니다. 잘못된 데이터는 표의 셀을 직접 클릭하거나 [✏️ 수정] 버튼으로 바로 고칠 수 있으며, 불필요한 행은 삭제할 수 있습니다.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-add-row" class="btn btn-sm btn-outline">➕ 단서 행 추가</button>
+            <button id="btn-clear-data" class="btn btn-sm btn-danger">🗑️ 전체 초기화</button>
+          </div>
+        </div>
+
+        <!-- Dropzone -->
+        <div id="dropzone" class="dropzone-box">
+          <div class="dropzone-icon">📄</div>
+          <div class="dropzone-text">CSV 파일을 이곳에 끌어다 놓거나 클릭하여 선택하세요</div>
+          <div class="dropzone-sub">지원 형식: .csv (UTF-8 인코딩 지원, 쉼표 구분)</div>
+          <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display: none;">
+        </div>
+
+        <!-- Direct Edit Hint Banner -->
+        <div class="table-edit-hint">
+          <span style="font-size: 1.1rem;">💡</span>
+          <div>
+            <strong>단서 데이터 직접 수정 기능:</strong> 표의 각 셀을 클릭하여 값이나 항목명을 즉시 편집할 수 있습니다. (수정 후 Enter 키를 누르거나 다른 곳을 클릭하면 그래프와 분석에 즉시 반영됩니다.)
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="font-weight: 700; color: var(--pink-800); font-size: 0.95rem;">
+            📊 단서 데이터 표 (Direct Editable Table)
+          </div>
+          <span id="data-row-count-badge" class="badge-recommend badge-match">총 7개 단서 행</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="detective-table">
+            <thead id="data-table-head"></thead>
+            <tbody id="data-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 기능 2: 데이터 시각화 (꺾은선, 막대, 원형, 색상 커스텀, 단위, 범위) -->
+      <!-- ==================================================== -->
+      <section id="step-vis-card" class="detective-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📊 [기능 2] 데이터 시각화: 알맞은 그래프 & 색상 커스텀</h2>
+            <p class="card-subtitle">데이터의 특성에 부합하는 그래프를 선택하고, 추천 테마 팔레트 및 항목별 개별 색상을 자유롭게 지정하세요.</p>
+          </div>
+          <div>
+            <button id="btn-save-chart-img" class="btn btn-sm btn-secondary">
+              🖼️ 그래프만 따로 저장 (PNG)
+            </button>
+          </div>
+        </div>
+
+        <div class="vis-grid">
+          <!-- Left Controls -->
+          <div class="vis-sidebar">
+            
+            <!-- 기준 컬럼 설정 (단일 및 다중 Y축 지원) -->
+            <div class="control-group">
+              <div class="control-title">
+                <span>🎯 축 데이터 지정</span>
+                <span id="multi-y-status-badge" class="badge-recommend badge-match" style="font-size: 0.72rem; padding: 2px 7px;">단일 Y축</span>
+              </div>
+              <div style="margin-bottom: 12px;">
+                <label for="select-label-col" class="form-label">가로축 (X축 / 항목명):</label>
+                <select id="select-label-col" class="form-select"></select>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                  <label class="form-label" style="margin-bottom: 0;">세로축 (Y축 / 다중 수치 데이터 선택):</label>
+                  <span style="font-size: 0.72rem; color: var(--pink-600); font-weight: 700;">복수 선택 가능 ✓</span>
+                </div>
+                <div id="multi-y-checkboxes-container" class="multi-y-checkbox-list">
+                  <!-- JS 동적 체크박스 목록 렌더링 -->
+                </div>
+                <p id="multi-y-help-text" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">
+                  * 여러 수치 열을 체크하면 한 그래프 안에 다중 막대/꺾은선으로 비교 분석할 수 있습니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- 그래프 유형 선택 -->
+            <div class="control-group">
+              <div class="control-title">📈 그래프 형태 선택</div>
+              <div class="graph-type-selector">
+                <button class="graph-type-btn" data-type="line">
+                  <span class="graph-icon">📈</span>
+                  <span>꺾은선</span>
+                </button>
+                <button class="graph-type-btn active" data-type="bar">
+                  <span class="graph-icon">📊</span>
+                  <span>막대</span>
+                </button>
+                <button class="graph-type-btn" data-type="pie">
+                  <span class="graph-icon">🥧</span>
+                  <span>원형</span>
+                </button>
+              </div>
+
+              <!-- 탐정의 적합성 선택 조건 & 피드백 박스 -->
+              <div class="detective-hint-box">
+                <div class="detective-hint-header">
+                  <span>🕵️ 탐정의 그래프 선택 가이드</span>
+                </div>
+                <div id="detective-hint-badge" class="badge-recommend badge-match">
+                  🎯 탐정의 판정: 그래프 선택 완료
+                </div>
+                <div id="detective-hint-text" class="detective-hint-text" style="margin-top: 6px;">
+                  데이터의 성격에 따라 가장 효과적인 그래프를 비교해보세요.
+                </div>
+              </div>
+            </div>
+
+            <!-- 그래프 색상 커스텀 (추천 팔레트 & 항목별 색상 변경) -->
+            <div class="control-group">
+              <div class="control-title" style="justify-content: space-between;">
+                <span>🎨 그래프 색상 커스텀</span>
+                <button id="btn-reset-colors" class="btn btn-xs btn-outline" title="기본 색상으로 초기화">초기화</button>
+              </div>
+              
+              <!-- 추천 테마 팔레트 프리셋 -->
+              <div style="margin-bottom: 12px;">
+                <label class="form-label">🌈 추천 테마 팔레트 선택:</label>
+                <div class="palette-presets-grid">
+                  <button class="palette-preset-btn active" data-palette="rainbow" title="레인보우 (다채로운 원색)">
+                    <span class="palette-preview" style="background: linear-gradient(90deg, #3B82F6, #10B981, #F59E0B, #EF4444, #8B5CF6);"></span>
+                    <span>레인보우</span>
+                  </button>
+                  <button class="palette-preset-btn" data-palette="ocean" title="오션 블루 (시원한 파랑)">
+                    <span class="palette-preview" style="background: linear-gradient(90deg, #2563EB, #3B82F6, #60A5FA, #93C5FD);"></span>
+                    <span>오션블루</span>
+                  </button>
+                  <button class="palette-preset-btn" data-palette="forest" title="에코 그린 (자연 싱그런 녹색)">
+                    <span class="palette-preview" style="background: linear-gradient(90deg, #059669, #10B981, #34D399, #6EE7B7);"></span>
+                    <span>에코그린</span>
+                  </button>
+                  <button class="palette-preset-btn" data-palette="sunset" title="선셋 웜 (따뜻한 주황/앰버)">
+                    <span class="palette-preview" style="background: linear-gradient(90deg, #EA580C, #F97316, #F59E0B, #FBBF24);"></span>
+                    <span>선셋웜</span>
+                  </button>
+                  <button class="palette-preset-btn" data-palette="violet" title="바이올렛 (기품있는 보라)">
+                    <span class="palette-preview" style="background: linear-gradient(90deg, #7C3AED, #8B5CF6, #A78BFA, #C084FC);"></span>
+                    <span>바이올렛</span>
+                  </button>
+                  <button class="palette-preset-btn" data-palette="rose" title="클래식 로즈 (단정한 핑크)">
+                    <span class="palette-preview" style="background: linear-gradient(90deg, #F472B6, #EC4899, #DB2777, #BE185D);"></span>
+                    <span>클래식로즈</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 항목별 개별 색상 지정 -->
+              <div>
+                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>🎯 항목별 개별 색상 지정:</span>
+                  <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: normal;">원하는 색상 클릭</span>
+                </label>
+                <div id="item-color-pickers-container" class="item-color-list">
+                  <!-- JS 동적 생성 -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 단위 입력창 -->
+            <div class="control-group">
+              <div class="control-title">🏷️ 그래프 단위(Unit) 설정</div>
+              <label for="chart-unit-input" class="form-label">측정 단위 입력:</label>
+              <input type="text" id="chart-unit-input" class="form-input" value="분" placeholder="예: 분, 명, 권, kg, %, °C, 원 등">
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">* 입력한 단위는 Y축 눈금 및 툴팁, 통계에 실시간 반영됩니다.</p>
+            </div>
+
+            <!-- 그래프별 범위 지정 기능 -->
+            <div class="control-group">
+              <div class="control-title">📏 그래프 범위(Range) 지정</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div>
+                  <label for="chart-ymin-input" class="form-label">Y축 최솟값:</label>
+                  <input type="number" id="chart-ymin-input" class="form-input" placeholder="자동">
+                </div>
+                <div>
+                  <label for="chart-ymax-input" class="form-label">Y축 최댓값:</label>
+                  <input type="number" id="chart-ymax-input" class="form-input" placeholder="자동">
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                <button id="btn-apply-range" class="btn btn-sm btn-primary" style="flex: 1;">범위 적용</button>
+                <button id="btn-reset-range" class="btn btn-sm btn-outline" style="flex: 1;">자동 초기화</button>
+              </div>
+
+              <!-- 데이터 행 슬라이스 범위 -->
+              <div style="border-top: 1px dashed var(--pink-200); padding-top: 10px;">
+                <label class="form-label">표시할 데이터 행 범위 (1 ~ <span id="slice-max-count">7</span>):</label>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="number" id="slice-start" class="form-input" style="width: 70px;" value="1" min="1">
+                  <span style="font-weight: 700; color: var(--pink-700);">~</span>
+                  <input type="number" id="slice-end" class="form-input" style="width: 70px;" value="7" min="1">
+                  <button id="btn-apply-slice" class="btn btn-sm btn-secondary" style="flex: 1;">행 지정</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 데이터 레이블(수치값) 표시 및 글씨 크기 설정 -->
+            <div class="control-group">
+              <div class="control-title">🔢 데이터 수치 레이블 & 글씨 크기</div>
+              <label for="toggle-data-labels" style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 700; color: var(--text-primary); cursor: pointer; padding: 4px 0;">
+                <input type="checkbox" id="toggle-data-labels" checked style="width: 18px; height: 18px; accent-color: var(--pink-600); cursor: pointer;">
+                <span>그래프 위 수치값(Data Label) 항상 표시</span>
+              </label>
+              
+              <div style="margin-top: 10px; border-top: 1px dashed var(--pink-200); padding-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 0.82rem; font-weight: 700; color: var(--pink-800);">레이블 글씨 크기(Font Size):</span>
+                  <span id="step2-fontsize-display" style="font-size: 0.82rem; font-weight: 800; color: var(--pink-600);">14px</span>
+                </div>
+                <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                  <button type="button" class="btn btn-xs btn-outline step2-fontsize-btn" data-size="11" style="flex: 1;">작게 (11px)</button>
+                  <button type="button" class="btn btn-xs btn-outline step2-fontsize-btn active" data-size="14" style="flex: 1;">보통 (14px)</button>
+                  <button type="button" class="btn btn-xs btn-outline step2-fontsize-btn" data-size="18" style="flex: 1;">크게 (18px)</button>
+                  <button type="button" class="btn btn-xs btn-outline step2-fontsize-btn" data-size="22" style="flex: 1;">아주크게 (22px)</button>
+                </div>
+                <input type="range" id="step2-fontsize-slider" min="9" max="28" value="14" step="1" style="width: 100%; accent-color: var(--pink-600);">
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">* 글씨 크기는 2단계 시각화 캔버스와 4단계 레포트 인쇄용 증거 그래프에 실시간 동기화됩니다.</p>
+            </div>
+
+          </div>
+
+          <!-- Right Canvas Area -->
+          <div class="chart-display-card">
+            <div class="chart-display-header">
+              <div class="chart-title-area">
+                <h3 id="chart-display-title" class="chart-main-title">우리 반 주간 독서 시간 탐정 분석</h3>
+                <span id="chart-unit-badge" class="chart-unit-badge">단위: 분</span>
+              </div>
+            </div>
+            <div class="canvas-container">
+              <canvas id="detective-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 기능 3: 데이터 분석 (기초통계, 심층분석, 다각도 관계, 종합의미해석, 토의질문) -->
+      <!-- ==================================================== -->
+      <section id="step-analysis-card" class="detective-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🔎 [기능 3] 데이터 분석: 다각도 정밀 분석 및 심층 의미 해석</h2>
+            <p class="card-subtitle">기초 통계량부터 대표값 왜곡 진단, 집단 내 편차, 상위권 집중도, 맥락적 추론 및 수업 토의 질문까지 심층적으로 분석합니다.</p>
+          </div>
+          <div>
+            <button id="btn-copy-analysis" class="btn btn-sm btn-secondary">
+              📋 전체 심층 분석 복사
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. 핵심 기초 통계 지표 카드 그리드 -->
+        <div class="stat-cards-grid">
+          <div class="stat-box">
+            <div class="stat-label">📊 산술평균 (Mean)</div>
+            <div id="stat-avg" class="stat-value">0</div>
+            <div class="stat-sub">전체 단서의 대표값</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">➕ 총합계 (Sum)</div>
+            <div id="stat-sum" class="stat-value">0</div>
+            <div class="stat-sub">데이터 전체 누적 수량</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">🏆 최댓값 (Max)</div>
+            <div id="stat-max" class="stat-value">0</div>
+            <div class="stat-sub">가장 두드러진 최고 단서</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">🔻 최솟값 (Min)</div>
+            <div id="stat-min" class="stat-value">0</div>
+            <div class="stat-sub">가장 적은 최저 단서</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">🔢 빈도 (Count)</div>
+            <div id="stat-count" class="stat-value">0</div>
+            <div class="stat-sub">수집된 유효 항목 수</div>
+          </div>
+        </div>
+
+        <!-- 1-2. 심층 통계 보조 지표 (중앙값, 사분위범위, 변동계수, 상위집중도) -->
+        <div class="stat-sub-grid">
+          <div class="stat-sub-box">
+            <div class="stat-sub-title">
+              <span>🎯 중앙값 (Median)</span>
+              <span title="크기 순서대로 나열했을 때 정가운데 값">ℹ️</span>
+            </div>
+            <div id="stat-median" class="stat-sub-val">0</div>
+            <div class="stat-sub-desc">극단값의 영향을 받지 않는 위치 대표값</div>
+          </div>
+          <div class="stat-sub-box">
+            <div class="stat-sub-title">
+              <span>📏 사분위범위 (IQR)</span>
+              <span title="중앙 50% 데이터가 분포하는 구간 (Q3 - Q1)">ℹ️</span>
+            </div>
+            <div id="stat-iqr" class="stat-sub-val">0</div>
+            <div class="stat-sub-desc">핵심 50% 데이터의 산포 구간</div>
+          </div>
+          <div class="stat-sub-box">
+            <div class="stat-sub-title">
+              <span>⚡ 변동계수 (CV)</span>
+              <span title="(표준편차 ÷ 평균) × 100% : 상대적 흩어짐 정도">ℹ️</span>
+            </div>
+            <div id="stat-cv" class="stat-sub-val">0%</div>
+            <div class="stat-sub-desc" id="stat-cv-desc">집단 내 편차 및 안정성 지수</div>
+          </div>
+          <div class="stat-sub-box">
+            <div class="stat-sub-title">
+              <span>👑 상위권 점유율</span>
+              <span title="상위 2개 항목이 전체 총합에서 차지하는 비중">ℹ️</span>
+            </div>
+            <div id="stat-top-share" class="stat-sub-val">0%</div>
+            <div class="stat-sub-desc">데이터의 쏠림 및 편중 정도</div>
+          </div>
+        </div>
+
+        <!-- 2. 다각도 항목별 정밀 비교 및 데이터 관계 파악 -->
+        <div class="analysis-cards-row">
+          <div class="insight-panel">
+            <div class="insight-panel-title">
+              <span>⚖️ 다각도 정밀 분석 & 데이터 관계 진단</span>
+              <span style="font-size: 0.8rem; color: var(--pink-600);">탐정 과학 분석</span>
+            </div>
+            <div id="analysis-comparison-content">
+              <!-- JS 동적 생성 -->
+            </div>
+          </div>
+
+          <!-- 3. 데이터 의미 해석 (탐정의 사건 추론 해설) -->
+          <div class="detective-report-box">
+            <div class="report-badge">🕵️ 탐정의 종합 데이터 의미 해석 보고서</div>
+            <div id="detective-interpretation-content" class="interpretation-text">
+              데이터 분석을 로딩 중입니다...
+            </div>
+
+            <!-- 수업 모둠 토의 질문 3선 -->
+            <div class="discussion-box">
+              <div class="discussion-header">
+                <span>💬 탐정의 교실 탐구 & 토의 질문 (Discussion Questions)</span>
+              </div>
+              <div id="detective-discussion-content">
+                <!-- JS 동적 생성 -->
+              </div>
+            </div>
+            
+            <!-- 학생/교사 직접 작성 소견란 -->
+            <label for="detective-notes-input" style="font-size: 0.88rem; font-weight: 700; color: var(--pink-800); display: block; margin-top: 16px; margin-bottom: 6px;">
+              ✍️ 분석관 소견 및 교육적 피드백 메모 (학생/선생님 작성란):
+            </label>
+            <textarea id="detective-notes-input" class="notes-textarea" placeholder="이 데이터를 통해 새롭게 알게 된 점, 원인에 대한 나의 생각, 다음 개선을 위한 실천 계획을 자유롭게 적어보세요."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- 기능 4: 레포트 저장 및 출력 (PDF 다운로드, 클라우드 저장, 텍스트 복사) -->
+      <!-- ==================================================== -->
+      <section id="step-report-card" class="detective-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📑 [기능 4] 레포트 저장 및 출력: 최종 탐정 분석 보고서</h2>
+            <p class="card-subtitle">입력 데이터, 시각화 그래프, 심층 분석 및 탐정 소견을 포함한 완성형 보고서를 확인하고 마우스로 그래프 크기를 자유롭게 조절하여 PDF로 출력하세요.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="btn-download-pdf" class="btn btn-primary">
+              📄 PDF 레포트 다운로드
+            </button>
+            <button id="btn-save-firebase" class="btn btn-secondary">
+              ☁️ Firebase / 로컬에 저장
+            </button>
+          </div>
+        </div>
+
+        <!-- 최종 인쇄용 보고서 시트 -->
+        <div id="printable-report-sheet" class="report-sheet">
+          <div class="report-header-section">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="font-size: 1.2rem;">🔍</span>
+                <span style="font-size: 0.85rem; font-weight: 800; color: var(--pink-600); letter-spacing: 0.05em;">DATA DETECTIVE ANALYSIS REPORT</span>
+              </div>
+              <h2 id="report-title-display" class="report-main-heading">우리 반 주간 독서 시간 탐정 분석</h2>
+              <div id="report-date-display" class="report-meta">분석 일자: 2026년 | 탐정 파일: reading_data.csv</div>
+            </div>
+            <div class="report-seal">
+              <span>분석 완료</span>
+              <span style="font-size: 0.9rem;">검증済</span>
+            </div>
+          </div>
+
+          <!-- 통계 요약 -->
+          <h3 class="report-section-title">📌 1. 핵심 단서 통계 요약</h3>
+          <div id="report-stats-summary"></div>
+
+          <!-- 시각화 증거 그래프 -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; margin-bottom: 10px;">
+            <h3 class="report-section-title" style="margin: 0;">📊 2. 시각화 증거 그래프 (정밀 확대 분석도)</h3>
+            
+            <!-- 그래프 크기 및 레이블 글씨 크기 마우스 조절 컨트롤 바 -->
+            <div class="report-size-toolbar no-print">
+              <span class="report-size-label">🖱️ 그래프 크기:</span>
+              <button type="button" class="btn btn-xs btn-outline report-size-preset-btn" data-width="600" data-height="360">보통 (600px)</button>
+              <button type="button" class="btn btn-xs btn-outline report-size-preset-btn active" data-width="850" data-height="450">크게 (850px)</button>
+              <button type="button" class="btn btn-xs btn-outline report-size-preset-btn" data-width="1000" data-height="540">최대 (100%)</button>
+              <div style="display: flex; align-items: center; gap: 4px; margin-left: 4px;">
+                <label for="report-chart-width-slider" style="font-size: 0.76rem; color: var(--pink-700); font-weight: 700;">가로폭:</label>
+                <input type="range" id="report-chart-width-slider" min="450" max="1000" value="850" step="25" style="width: 75px; accent-color: var(--pink-600);">
+                <span id="report-chart-width-val" style="font-size: 0.76rem; font-weight: 700; min-width: 42px; color: var(--pink-800);">850px</span>
+              </div>
+              <div class="report-toolbar-divider"></div>
+              <!-- 레이블 글씨 크기 조절 컨트롤 -->
+              <span class="report-size-label">🔤 레이블 글씨:</span>
+              <div class="report-fontsize-btn-group">
+                <button type="button" class="btn btn-xs btn-outline report-fontsize-btn" data-size="11">작게</button>
+                <button type="button" class="btn btn-xs btn-outline report-fontsize-btn active" data-size="14">보통</button>
+                <button type="button" class="btn btn-xs btn-outline report-fontsize-btn" data-size="18">크게</button>
+                <button type="button" class="btn btn-xs btn-outline report-fontsize-btn" data-size="22">아주크게</button>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <input type="range" id="report-chart-fontsize-slider" min="9" max="28" value="14" step="1" style="width: 70px; accent-color: var(--pink-600);" title="레이블 글씨 크기 슬라이더">
+                <span id="report-chart-fontsize-val" style="font-size: 0.76rem; font-weight: 700; min-width: 32px; color: var(--pink-800);">14px</span>
+              </div>
+              <button type="button" id="btn-reset-report-chart-size" class="btn btn-xs btn-outline" title="그래프 크기 및 글씨 크기 기본값으로 복원">↺ 기본값</button>
+            </div>
+          </div>
+
+          <div class="report-chart-card">
+            <div class="report-chart-header">
+              <div class="report-chart-title" id="report-chart-title-tag">
+                📈 분석 단서 시각화 증거도
+              </div>
+              <div class="report-chart-badges">
+                <span id="report-chart-type-badge" class="badge-chart-type">막대 그래프</span>
+                <span id="report-chart-unit-badge" class="badge-chart-unit">단위: 분</span>
+              </div>
+            </div>
+            
+            <!-- 마우스 드래그로 직접 크기 조절 가능한 캔버스 래퍼 -->
+            <div id="report-chart-resizable-container" class="report-chart-resizable-container">
+              <div class="report-chart-canvas-wrap">
+                <img id="report-chart-img" class="report-chart-image" alt="분석 증거 그래프">
+              </div>
+              <div class="report-resize-handle" title="마우스로 드래그하여 그래프 크기(가로/세로)를 조절하세요">
+                <span>↘</span>
+              </div>
+            </div>
+
+            <div class="report-chart-footer">
+              <div class="report-axis-info">
+                <span>📍 가로축(X): <strong id="report-chart-xaxis-label">단서 항목</strong></span>
+                <span style="margin: 0 8px; color: var(--pink-300);">|</span>
+                <span>📍 세로축(Y): <strong id="report-chart-yaxis-label">수치 지표</strong></span>
+              </div>
+              <div class="report-datalabel-note">
+                ※ 상단 툴바(슬라이더·프리셋) 및 우측하단(↘) 드래그로 그래프 크기와 레이블 글씨 크기를 조절하여 맞춤 PDF 출력이 가능합니다.
+              </div>
+            </div>
+          </div>
+
+          <!-- 데이터 의미 해석 -->
+          <h3 class="report-section-title">💡 3. 데이터 관계 분석 및 의미 해석</h3>
+          <div id="report-interpretation-display" style="background: #FFF7F9; border: 1px solid var(--pink-200); border-radius: 8px; padding: 16px; font-size: 0.92rem; line-height: 1.7; white-space: pre-wrap;"></div>
+
+          <!-- 분석관 최종 소견 -->
+          <h3 class="report-section-title">📝 4. 탐정 분석관 최종 의견 (학습 기록 & 평가)</h3>
+          <div id="report-notes-display" style="background: #FFFFFF; border: 1.5px dashed var(--pink-400); border-radius: 8px; padding: 16px; font-size: 0.92rem; line-height: 1.7; color: var(--text-primary);">
+            작성된 분석관 소견이 없습니다.
+          </div>
+
+          <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--pink-200); display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+            <span>데이터 분석 탐정 교육용 플랫폼 (Data Analysis Detective for Education)</span>
+            <span>작성자: 학생 탐정단</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 저장된 리포트 목록 모달 -->
+    <div id="load-reports-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">📂 저장된 탐정 분석 보고서</h3>
+          <button class="close-btn" onclick="closeModal('load-reports-modal')">&times;</button>
+        </div>
+        <div id="reports-list-container"></div>
+        <div style="margin-top: 20px; text-align: right;">
+          <button class="btn btn-outline" onclick="closeModal('load-reports-modal')">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase 설정 및 가이드 모달 -->
+    <div id="firebase-help-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">⚙️ Firebase (Firestore) 연동 가이드</h3>
+          <button class="close-btn" onclick="closeModal('firebase-help-modal')">&times;</button>
+        </div>
+        <div style="font-size: 0.92rem; line-height: 1.7; color: var(--text-primary);">
+          <p style="margin-bottom: 12px;">
+            이 웹앱은 <strong>Firebase JS SDK(CDN 방식)</strong>를 탑재하고 있습니다. 여러분의 프로젝트 설정값을 넣으면 전 세계 어디서나 실시간 클라우드 저장이 활성화됩니다!
+          </p>
+
+          <div style="background: var(--pink-50); border-left: 4px solid var(--pink-500); padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <strong>(1) Firebase 콘솔에서 새 프로젝트 생성하기:</strong><br>
+            1. 웹 브라우저로 <code>console.firebase.google.com</code>에 접속하여 Google 계정으로 로그인합니다.<br>
+            2. <strong>'프로젝트 추가'</strong> 버튼을 누르고 프로젝트 이름(예: <code>data-detective-app</code>)을 입력한 뒤 단계를 진행하여 생성합니다.
+          </div>
+
+          <div style="background: var(--pink-50); border-left: 4px solid var(--pink-500); padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <strong>(2) Firestore Database를 테스트 모드로 생성하고 컬렉션 구조 확인하기:</strong><br>
+            1. 좌측 메뉴에서 <strong>빌드 > Firestore Database</strong>를 선택하고 <strong>'데이터베이스 만들기'</strong>를 클릭합니다.<br>
+            2. 보안 규칙 단계에서 <strong>'테스트 모드에서 시작'</strong>(누구나 읽기/쓰기 허용)을 선택하고 완료합니다.<br>
+            3. 컬렉션 구조: 본 웹앱은 <code>detective_reports</code> 컬렉션에 보고서(사건명, 날짜, 데이터, 통계, 메모)를 JSON 문서 형태로 자동 생성 및 저장합니다.
+          </div>
+
+          <div style="background: var(--pink-50); border-left: 4px solid var(--pink-500); padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <strong>(3) "웹 앱 추가"로 앱 등록 후 firebaseConfig 얻기 및 코드에 붙여넣는 위치:</strong><br>
+            1. Firebase 프로젝트 홈 화면 중앙의 <strong>웹 아이콘(&lt;/&gt;)</strong>을 클릭하여 웹 앱을 등록합니다.<br>
+            2. 화면에 나타나는 <code>const firebaseConfig = { ... }</code> 코드 블록을 복사합니다.<br>
+            3. <code>app.js</code> 파일의 가장 상단에 위치한 아래 객체에 실제 발급받은 키 값을 대입해주시면 즉시 클라우드 Firestore와 자동 연동됩니다:
+          </div>
+
+          <div class="code-box">
+const firebaseConfig = {
+  apiKey: "여기에_API_KEY",
+  authDomain: "여기에_AUTH_DOMAIN",
+  projectId: "여기에_PROJECT_ID",
+  storageBucket: "여기에_STORAGE_BUCKET",
+  messagingSenderId: "여기에_SENDER_ID",
+  appId: "여기에_APP_ID"
+};
+          </div>
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+          <button class="btn btn-primary" onclick="closeModal('firebase-help-modal')">확인 완료</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 단서 행 데이터 직접 수정 모달 -->
+    <div id="edit-row-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">✏️ 단서 행 데이터 직접 수정</h3>
+          <button class="close-btn" onclick="closeModal('edit-row-modal')">&times;</button>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
+          선택한 단서 행의 값들을 확인하고 수정한 뒤 [저장하기]를 누르면 즉시 그래프와 분석에 반영됩니다.
+        </p>
+        <div id="edit-row-form-fields" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn btn-outline" onclick="closeModal('edit-row-modal')">취소</button>
+          <button id="btn-save-row-edit" class="btn btn-primary">💾 변경사항 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 데이터 클렌징(정제) 모달 -->
+    <div id="data-cleansing-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content cleansing-modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">🧹 데이터 클렌징 (결측치 & 이상치 정제)</h3>
+          <button class="close-btn" onclick="closeModal('data-cleansing-modal')">&times;</button>
+        </div>
+        <div class="cleansing-modal-body">
+          <p class="cleansing-intro">
+            업로드된 CSV 데이터에서 <strong>빈 셀(결측치)</strong> 또는 <strong>숫자가 아닌 비정상 데이터</strong>가 발견되었습니다.<br>
+            정확한 데이터 분석과 시각화 그래프 작성을 위해 원하는 정제 방식을 선택해 주세요.
+          </p>
+
+          <div id="cleansing-summary-box" class="cleansing-summary">
+            <!-- JS 동적 생성: 발견된 이상치 요약 -->
+          </div>
+
+          <div class="cleansing-options-container">
+            <h4 class="cleansing-subheading">정제 처리 방식 선택</h4>
+
+            <label class="cleansing-option-card">
+              <input type="radio" name="cleansing-action" value="filter" checked>
+              <div class="cleansing-option-text">
+                <div class="cleansing-option-title">🗑️ 이상치 포함 행 자동 필터링 (삭제)</div>
+                <div class="cleansing-option-desc">결측치나 숫자가 아닌 비정상 값이 포함된 행 전체를 제거하여, 신뢰할 수 있는 정상 데이터만으로 분석을 진행합니다. (추천)</div>
+              </div>
+            </label>
+
+            <label class="cleansing-option-card">
+              <input type="radio" name="cleansing-action" value="zero">
+              <div class="cleansing-option-text">
+                <div class="cleansing-option-title">0️⃣ 결측치 및 비정상 값을 '0'으로 변환</div>
+                <div class="cleansing-option-desc">모든 행을 유지하면서 수치 열의 빈 셀이나 문자 데이터를 0으로 치환하여 통계 계산 및 그래프를 완성합니다.</div>
+              </div>
+            </label>
+
+            <label class="cleansing-option-card">
+              <input type="radio" name="cleansing-action" value="keep">
+              <div class="cleansing-option-text">
+                <div class="cleansing-option-title">⚠️ 변환 없이 원본 그대로 유지</div>
+                <div class="cleansing-option-desc">정제 작업을 거치지 않고 원본 파일 그대로 불러옵니다. (이후 표에서 직접 수정 가능)</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="cleansing-preview-wrap">
+            <h4 class="cleansing-subheading">이상치 상세 내역 (최대 5건)</h4>
+            <div id="cleansing-issues-list" class="cleansing-issues-list">
+              <!-- JS 동적 렌더링 -->
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="btn btn-outline" onclick="closeModal('data-cleansing-modal')">취소</button>
+          <button id="btn-apply-cleansing" class="btn btn-primary">✨ 정제 적용하고 불러오기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Application Script -->
+    <script src="/app.js"></script>
+  </body>
+</html>
