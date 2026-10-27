@@ -1,5 +1,5 @@
 /**
- * 데이터 분석 탐정 - 메인 애플리케이션 스크립트
+ * 스마트 데이터 분석 - 메인 애플리케이션 스크립트
  * 교육 현장(수업, 평가, 기록)을 위한 데이터 입력, 시각화, 다각도 분석 및 레포트 생성
  */
 
@@ -68,8 +68,8 @@ const PALETTES = {
 };
 
 const state = {
-  caseTitle: "우리 반 주간 독서 시간 탐정 분석",
-  fileName: "sample_reading_detective.csv",
+  caseTitle: "우리 반 주간 독서 시간 분석",
+  fileName: "sample_reading_data.csv",
   headers: [],
   rows: [],
   labelColumn: "",
@@ -94,10 +94,10 @@ const state = {
 
 let mainChart = null;
 
-// 교육용 사건 단서 샘플 데이터셋
+// 교육용 분석 샘플 데이터셋
 const SAMPLE_DATASETS = {
   reading: {
-    title: "우리 반 주간 독서 시간 탐정 분석",
+    title: "우리 반 주간 독서 시간 분석",
     unit: "분",
     csv: `요일,독서시간(분),읽은책(권)
 월요일,35,1
@@ -109,10 +109,10 @@ const SAMPLE_DATASETS = {
 일요일,90,5`
   },
   club: {
-    title: "교실 동아리 선호도 조사 사건",
+    title: "교실 동아리 선호도 조사",
     unit: "명",
     csv: `동아리명,선택학생수(명),만족도(점)
-코딩탐정단,18,92
+코딩동아리,18,92
 데이터분석반,15,88
 미술창작부,12,85
 보드게임부,14,90
@@ -316,7 +316,7 @@ function setupEventListeners() {
     });
   }
 
-  // 사건 제목 및 탐정 노트 편집
+  // 분석 주제 및 메모 편집
   const titleInput = document.getElementById("case-title-input");
   if (titleInput) {
     titleInput.addEventListener("input", (e) => {
@@ -1624,12 +1624,12 @@ function updateGraphRecommendation() {
 
   if (isMatch) {
     hintBadgeEl.className = "badge-recommend badge-match";
-    hintBadgeEl.innerHTML = "🎯 탐정의 판정: 완벽한 그래프 선택!";
-    hintTextEl.innerHTML = `학생 탐정님, 훌륭한 추리입니다! ${reasoning}`;
+    hintBadgeEl.innerHTML = "🎯 판정: 완벽한 그래프 선택!";
+    hintTextEl.innerHTML = `훌륭한 분석입니다! ${reasoning}`;
   } else {
     hintBadgeEl.className = "badge-recommend badge-hint";
-    hintBadgeEl.innerHTML = `💡 탐정 힌트: '${getChartTypeName(bestType)}' 추천`;
-    hintTextEl.innerHTML = `현재 '${getChartTypeName(currentType)}'를 선택하셨습니다. ${reasoning} 필요 시 언제든 다른 그래프로 변경하여 다각도로 단서를 살펴보세요.`;
+    hintBadgeEl.innerHTML = `💡 분석 힌트: '${getChartTypeName(bestType)}' 추천`;
+    hintTextEl.innerHTML = `현재 '${getChartTypeName(currentType)}'를 선택하셨습니다. ${reasoning} 필요 시 언제든 다른 그래프로 변경하여 다각도로 데이터를 살펴보세요.`;
   }
 }
 
@@ -1825,8 +1825,8 @@ function updateDetectiveAnalysis() {
     `;
   }
 
-  // 3. 탐정의 종합 데이터 의미 해석 보고서 (체계적 5단계 내러티브)
-  let detailedInterpretation = `[데이터 분석 탐정 종합 분석 보고서]\n\n`;
+  // 3. 종합 데이터 의미 해석 보고서 (체계적 5단계 내러티브)
+  let detailedInterpretation = `[스마트 데이터 종합 분석 보고서]\n\n`;
   
   detailedInterpretation += `■ 1. 사건 개요 및 데이터 규모\n`;
   detailedInterpretation += `수집된 사건 단서는 총 ${count}개 항목으로 구성되어 있으며, 세로축 '${state.valueColumn}'의 총합계는 ${sum.toLocaleString()}${unit}입니다. 전체 항목의 산술평균은 ${avg.toFixed(1)}${unit}, 크기 순 중앙값은 ${median.toFixed(1)}${unit}로 확인되었습니다.\n\n`;
@@ -1885,7 +1885,7 @@ function updateReportSheetContent(stats) {
   if (titleDisplay) titleDisplay.textContent = state.caseTitle;
   if (dateDisplay) {
     const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
-    dateDisplay.textContent = `분석 기록일자: ${today} | 탐정 파일: ${state.fileName}`;
+    dateDisplay.textContent = `분석 기록일자: ${today} | 데이터 파일: ${state.fileName}`;
   }
 
   if (statsSummary) {
@@ -2191,7 +2191,7 @@ function exportReportPdf() {
   const reportElement = document.getElementById("printable-report-sheet");
   if (!reportElement) return;
 
-  showToast("📄 PDF 탐정 분석 보고서를 생성하는 중입니다...");
+  showToast("📄 PDF 분석 보고서를 생성하는 중입니다...");
 
   // PDF 출력 직전 최신 고해상도 차트 이미지 동기화
   updateReportChartImage();
@@ -2199,7 +2199,7 @@ function exportReportPdf() {
   if (typeof html2pdf !== 'undefined') {
     const opt = {
       margin: [8, 8, 8, 8],
-      filename: `${state.caseTitle.replace(/\s+/g, '_')}_탐정보고서.pdf`,
+      filename: `${state.caseTitle.replace(/\s+/g, '_')}_분석보고서.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
@@ -2241,9 +2241,9 @@ function copyAnalysisText() {
   const interpretationEl = document.getElementById("detective-interpretation-content");
   if (!interpretationEl) return;
 
-  let fullAnalysisText = `[데이터 분석 탐정 - 분석 레포트 요약]\n`;
-  fullAnalysisText += `사건명: ${state.caseTitle}\n`;
-  fullAnalysisText += `단서 파일: ${state.fileName}\n`;
+  let fullAnalysisText = `[스마트 데이터 분석 - 분석 레포트 요약]\n`;
+  fullAnalysisText += `분석주제: ${state.caseTitle}\n`;
+  fullAnalysisText += `데이터 파일: ${state.fileName}\n`;
   fullAnalysisText += `----------------------------------------\n`;
   fullAnalysisText += interpretationEl.textContent + `\n`;
   fullAnalysisText += `----------------------------------------\n`;
@@ -2314,7 +2314,7 @@ async function openLoadReportsModal() {
   if (!modal || !listContainer) return;
 
   modal.style.display = "flex";
-  listContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>저장된 탐정 보고서를 검색하는 중...</p>";
+  listContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>저장된 분석 보고서를 검색하는 중...</p>";
 
   let reports = [];
 
@@ -2341,7 +2341,7 @@ async function openLoadReportsModal() {
     listContainer.innerHTML = `
       <div style="text-align: center; padding: 24px; color: var(--text-muted);">
         <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
-        <p>저장된 탐정 분석 보고서가 아직 없습니다.</p>
+        <p>저장된 분석 보고서가 아직 없습니다.</p>
         <p style="font-size: 0.85rem; margin-top: 4px;">상단의 'Firebase/로컬에 저장' 버튼으로 현재 분석을 보관해보세요.</p>
       </div>
     `;

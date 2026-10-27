@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>데이터 분석 탐정 - 교육용 데이터 시각화 & 분석 플랫폼</title>
-    <meta name="description" content="교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 탐정 웹 애플리케이션" />
-    <meta property="og:title" content="데이터 분석 탐정" />
-    <meta property="og:description" content="교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 탐정 웹 애플리케이션" />
+    <title>데이터 분석 - 교육용 데이터 시각화 & 분석 플랫폼</title>
+    <meta name="description" content="교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 스마트 웹 애플리케이션" />
+    <meta property="og:title" content="스마트 데이터 분석" />
+    <meta property="og:description" content="교육 현장(수업, 평가, 기록)에서 데이터 입력(CSV), 시각화, 다각도 분석, 레포트 저장 및 출력을 수행하는 파스텔 핑크 테마의 스마트 웹 애플리케이션" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
@@ -15,8 +15,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <!-- CSS Stylesheet -->
-    <link rel="stylesheet" href="/style.css">
+    <!-- CSS Stylesheet (Relative path for GitHub Pages & Local Dev) -->
+    <link rel="stylesheet" href="./style.css">
 
     <!-- CDN Libraries: Chart.js, Chart.js DataLabels, PapaParse, html2pdf.js, Firebase Compat SDK -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -32,9 +32,9 @@
     <header class="app-header">
       <div class="header-container">
         <div class="brand-badge">
-          <div class="detective-icon-box">🔍</div>
+          <div class="detective-icon-box">📊</div>
           <div>
-            <h1 class="brand-title">데이터 분석 탐정</h1>
+            <h1 class="brand-title">스마트 데이터 분석</h1>
             <p class="brand-sub">교육 현장(수업·평가·기록)을 위한 스마트 데이터 분석 연구소</p>
           </div>
         </div>
@@ -55,14 +55,14 @@
     <!-- Main Container -->
     <main class="main-content">
 
-      <!-- Detective Mission Banner -->
+      <!-- Analysis Mission Banner -->
       <section class="mission-banner">
         <div class="mission-text">
-          <h2>🕵️ 오늘의 탐정 임무 (Mission)</h2>
-          <p>CSV 파일 속 숨겨진 단서를 표로 정리하고, 가장 적합한 그래프로 증거를 시각화한 후 다각도 추론 분석 리포트를 완성하세요!</p>
+          <h2>🎯 오늘의 분석 미션 (Mission)</h2>
+          <p>CSV 파일 속 데이터를 표로 정리하고, 가장 적합한 그래프로 시각화한 후 다각도 추론 분석 리포트를 완성하세요!</p>
         </div>
         <div class="sample-buttons">
-          <span style="font-size: 0.82rem; font-weight: 700; color: var(--pink-700); align-self: center; margin-right: 4px;">추천 사건 단서:</span>
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--pink-700); align-self: center; margin-right: 4px;">추천 분석 데이터:</span>
           <button class="btn btn-sm btn-secondary" data-sample="reading">📖 주간 독서시간</button>
           <button class="btn btn-sm btn-secondary" data-sample="club">🎨 동아리 선호도</button>
           <button class="btn btn-sm btn-secondary" data-sample="recycling">♻️ 쓰레기 분리배출</button>
@@ -102,13 +102,13 @@
         </button>
       </nav>
 
-      <!-- 사건 제목 설정 카드 -->
+      <!-- 분석 주제 설정 카드 -->
       <div class="detective-card" style="padding: 16px 20px; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
           <label for="case-title-input" style="font-weight: 700; color: var(--pink-800); font-size: 0.95rem; white-space: nowrap;">
-            🔖 현재 사건명(분석 주제):
+            🔖 현재 분석 주제:
           </label>
-          <input type="text" id="case-title-input" class="form-input" style="flex: 1; min-width: 240px;" value="우리 반 주간 독서 시간 탐정 분석" placeholder="분석 주제 또는 사건명을 입력하세요">
+          <input type="text" id="case-title-input" class="form-input" style="flex: 1; min-width: 240px;" value="우리 반 주간 독서 시간 분석" placeholder="분석 주제 또는 과제명을 입력하세요">
         </div>
       </div>
 
@@ -221,13 +221,13 @@
                 </button>
               </div>
 
-              <!-- 탐정의 적합성 선택 조건 & 피드백 박스 -->
+              <!-- 적합성 선택 조건 & 피드백 박스 -->
               <div class="detective-hint-box">
                 <div class="detective-hint-header">
-                  <span>🕵️ 탐정의 그래프 선택 가이드</span>
+                  <span>📊 데이터 분석 그래프 선택 가이드</span>
                 </div>
                 <div id="detective-hint-badge" class="badge-recommend badge-match">
-                  🎯 탐정의 판정: 그래프 선택 완료
+                  🎯 그래프 선택 완료
                 </div>
                 <div id="detective-hint-text" class="detective-hint-text" style="margin-top: 6px;">
                   데이터의 성격에 따라 가장 효과적인 그래프를 비교해보세요.
@@ -353,7 +353,7 @@
           <div class="chart-display-card">
             <div class="chart-display-header">
               <div class="chart-title-area">
-                <h3 id="chart-display-title" class="chart-main-title">우리 반 주간 독서 시간 탐정 분석</h3>
+                <h3 id="chart-display-title" class="chart-main-title">우리 반 주간 독서 시간 분석</h3>
                 <span id="chart-unit-badge" class="chart-unit-badge">단위: 분</span>
               </div>
             </div>
@@ -450,16 +450,16 @@
           <div class="insight-panel">
             <div class="insight-panel-title">
               <span>⚖️ 다각도 정밀 분석 & 데이터 관계 진단</span>
-              <span style="font-size: 0.8rem; color: var(--pink-600);">탐정 과학 분석</span>
+              <span style="font-size: 0.8rem; color: var(--pink-600);">데이터 과학 분석</span>
             </div>
             <div id="analysis-comparison-content">
               <!-- JS 동적 생성 -->
             </div>
           </div>
 
-          <!-- 3. 데이터 의미 해석 (탐정의 사건 추론 해설) -->
+          <!-- 3. 데이터 의미 해석 (종합 추론 해설) -->
           <div class="detective-report-box">
-            <div class="report-badge">🕵️ 탐정의 종합 데이터 의미 해석 보고서</div>
+            <div class="report-badge">📊 종합 데이터 의미 해석 보고서</div>
             <div id="detective-interpretation-content" class="interpretation-text">
               데이터 분석을 로딩 중입니다...
             </div>
@@ -467,7 +467,7 @@
             <!-- 수업 모둠 토의 질문 3선 -->
             <div class="discussion-box">
               <div class="discussion-header">
-                <span>💬 탐정의 교실 탐구 & 토의 질문 (Discussion Questions)</span>
+                <span>💬 교실 탐구 & 토의 질문 (Discussion Questions)</span>
               </div>
               <div id="detective-discussion-content">
                 <!-- JS 동적 생성 -->
@@ -489,8 +489,8 @@
       <section id="step-report-card" class="detective-card">
         <div class="card-header">
           <div>
-            <h2 class="card-title">📑 [기능 4] 레포트 저장 및 출력: 최종 탐정 분석 보고서</h2>
-            <p class="card-subtitle">입력 데이터, 시각화 그래프, 심층 분석 및 탐정 소견을 포함한 완성형 보고서를 확인하고 마우스로 그래프 크기를 자유롭게 조절하여 PDF로 출력하세요.</p>
+            <h2 class="card-title">📑 [기능 4] 레포트 저장 및 출력: 최종 데이터 분석 보고서</h2>
+            <p class="card-subtitle">입력 데이터, 시각화 그래프, 심층 분석 및 분석 소견을 포함한 완성형 보고서를 확인하고 마우스로 그래프 크기를 자유롭게 조절하여 PDF로 출력하세요.</p>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-download-pdf" class="btn btn-primary">
@@ -507,11 +507,11 @@
           <div class="report-header-section">
             <div>
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span style="font-size: 1.2rem;">🔍</span>
-                <span style="font-size: 0.85rem; font-weight: 800; color: var(--pink-600); letter-spacing: 0.05em;">DATA DETECTIVE ANALYSIS REPORT</span>
+                <span style="font-size: 1.2rem;">📊</span>
+                <span style="font-size: 0.85rem; font-weight: 800; color: var(--pink-600); letter-spacing: 0.05em;">DATA ANALYSIS REPORT</span>
               </div>
-              <h2 id="report-title-display" class="report-main-heading">우리 반 주간 독서 시간 탐정 분석</h2>
-              <div id="report-date-display" class="report-meta">분석 일자: 2026년 | 탐정 파일: reading_data.csv</div>
+              <h2 id="report-title-display" class="report-main-heading">우리 반 주간 독서 시간 분석</h2>
+              <div id="report-date-display" class="report-meta">분석 일자: 2026년 | 데이터 파일: reading_data.csv</div>
             </div>
             <div class="report-seal">
               <span>분석 완료</span>
@@ -593,14 +593,14 @@
           <div id="report-interpretation-display" style="background: #FFF7F9; border: 1px solid var(--pink-200); border-radius: 8px; padding: 16px; font-size: 0.92rem; line-height: 1.7; white-space: pre-wrap;"></div>
 
           <!-- 분석관 최종 소견 -->
-          <h3 class="report-section-title">📝 4. 탐정 분석관 최종 의견 (학습 기록 & 평가)</h3>
+          <h3 class="report-section-title">📝 4. 분석관 최종 의견 (학습 기록 & 평가)</h3>
           <div id="report-notes-display" style="background: #FFFFFF; border: 1.5px dashed var(--pink-400); border-radius: 8px; padding: 16px; font-size: 0.92rem; line-height: 1.7; color: var(--text-primary);">
             작성된 분석관 소견이 없습니다.
           </div>
 
           <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--pink-200); display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
-            <span>데이터 분석 탐정 교육용 플랫폼 (Data Analysis Detective for Education)</span>
-            <span>작성자: 학생 탐정단</span>
+            <span>스마트 데이터 분석 교육용 플랫폼 (Smart Data Analysis for Education)</span>
+            <span>작성자: 학생 분석팀</span>
           </div>
         </div>
       </section>
@@ -611,7 +611,7 @@
     <div id="load-reports-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title">📂 저장된 탐정 분석 보고서</h3>
+          <h3 class="modal-title">📂 저장된 데이터 분석 보고서</h3>
           <button class="close-btn" onclick="closeModal('load-reports-modal')">&times;</button>
         </div>
         <div id="reports-list-container"></div>
@@ -751,7 +751,7 @@ const firebaseConfig = {
     <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Application Script -->
-    <script src="/app.js"></script>
+    <!-- Application Script (Relative path for GitHub Pages & Local Dev) -->
+    <script src="./app.js"></script>
   </body>
 </html>
